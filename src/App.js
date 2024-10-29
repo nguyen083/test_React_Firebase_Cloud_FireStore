@@ -1,25 +1,30 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import NotificationList from './NotificationList';
+import { db } from './firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
+import NotificationForm from './NotificationForm';
 
-function App() {
+const App = () => {
+  const [notifications, setNotifications] = useState([]);
+
+  // Thêm logic lắng nghe realtime của bạn ở đây
+  useEffect(() => {
+    // Giả sử đây là nơi bạn thiết lập lắng nghe realtime từ Firestore
+    onSnapshot(collection(db, "notifications"), (snapshot) => {
+      const newData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setNotifications(newData);
+    });
+
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <NotificationForm />
+      <NotificationList notifications={notifications} /></>);
 }
 
 export default App;
